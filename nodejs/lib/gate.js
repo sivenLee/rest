@@ -6,7 +6,8 @@ var querystring = require('querystring');
 const KEY  = 'your key';
 const SECRET  = 'your secret';
 
-const API_URL = 'https://data.gate.io/';
+const API_QUERY_URL = 'https://data.gateio.io/';
+const API_TRADE_URL = 'https://api.gateio.io/';
 const PAIRS_URL = 'api2/1/pairs';
 const MARKETINFO_URL = 'api2/1/marketinfo';
 const MARKETLIST_URL = 'api2/1/marketlist';
@@ -20,6 +21,7 @@ const BALANCE_URL = 'api2/1/private/balances';
 const DEPOSITADDRESS_URL = 'api2/1/private/depositAddress';
 const DEPOSITSWITHDRAWALS_URL = 'api2/1/private/depositsWithdrawals';
 const BUY_URL = 'api2/1/private/buy';
+const SELL_URL = 'api2/1/private/sell';
 const CANCELORDER_URL = 'api2/1/private/cancelOrder';
 const CANCELALLORDERS_URL = 'api2/1/private/cancelAllOrders';
 const GETORDER_URL = 'api2/1/private/getOrder';
@@ -40,42 +42,43 @@ function Request (params,cp){
         }
     });
 }
-function getSign(form) {
-    return crypto.createHmac('sha512', SECRET).update(form).digest('hex').toString();
+function getSign(str) {
+    let unescapeStr = querystring.unescape(str);
+    return crypto.createHmac('sha512', SECRET).update(unescapeStr).digest('hex').toString();
 }
 
 var gate = {
 
     getPairs: function(cp) {
-        Request({method: 'GET', url: API_URL + PAIRS_URL, headers: { 'User-Agent' : USER_AGENT } },cp);
+        Request({method: 'GET', url: API_QUERY_URL + PAIRS_URL, headers: { 'User-Agent' : USER_AGENT } },cp);
     },
 
     getMarketinfo:function(cp) {
-        Request({method: 'GET', url: API_URL + MARKETINFO_URL, headers: { 'User-Agent' : USER_AGENT } },cp);
+        Request({method: 'GET', url: API_QUERY_URL + MARKETINFO_URL, headers: { 'User-Agent' : USER_AGENT } },cp);
     },
 
     getMarketlist:function (cp) {
-        Request({method: 'GET', url: API_URL + MARKETLIST_URL, headers: { 'User-Agent' : USER_AGENT } },cp);
+        Request({method: 'GET', url: API_QUERY_URL + MARKETLIST_URL, headers: { 'User-Agent' : USER_AGENT } },cp);
     },
 
     getTickers:function (cp) {
-        Request({method: 'GET', url: API_URL + TICKERS_URL, headers: { 'User-Agent' : USER_AGENT } },cp);
+        Request({method: 'GET', url: API_QUERY_URL + TICKERS_URL, headers: { 'User-Agent' : USER_AGENT } },cp);
     },
 
     getTicker:function (param,cp) {
-        Request({method: 'GET', url: API_URL + TICKER_URL + '/'+ param, headers: { 'User-Agent' : USER_AGENT } },cp);
+        Request({method: 'GET', url: API_QUERY_URL + TICKER_URL + '/'+ param, headers: { 'User-Agent' : USER_AGENT } },cp);
     },
 
     orderBooks:function (cp) {
-        Request({method: 'GET', url: API_URL + ORDERBOOKS_URL, headers: { 'User-Agent' : USER_AGENT } },cp);
+        Request({method: 'GET', url: API_QUERY_URL + ORDERBOOKS_URL, headers: { 'User-Agent' : USER_AGENT } },cp);
     },
 
     orderBook:function (param,cp) {
-        Request({method: 'GET', url: API_URL + ORDERBOOK_URL+  '/'+ param, headers: { 'User-Agent' : USER_AGENT } },cp);
+        Request({method: 'GET', url: API_QUERY_URL + ORDERBOOK_URL+  '/'+ param, headers: { 'User-Agent' : USER_AGENT } },cp);
     },
 
     tradeHistory:function (param,cp) {
-         Request({method: 'GET', url: API_URL + TRADEHISTORY_URL+  '/'+ param, headers: { 'User-Agent' : USER_AGENT } },cp);
+         Request({method: 'GET', url: API_QUERY_URL + TRADEHISTORY_URL+  '/'+ param, headers: { 'User-Agent' : USER_AGENT } },cp);
     },
 
     getBalances:function (cp) {
@@ -83,7 +86,7 @@ var gate = {
         let header = {};
         header.KEY = KEY;
         header.SIGN = getSign(querystring.stringify(form));
-        Request({method: 'POST', url: API_URL + BALANCE_URL, headers: header, form:form },cp);
+        Request({method: 'POST', url: API_TRADE_URL + BALANCE_URL, headers: header, form:form },cp);
     },
 
     depositAddress:function (currency, cp) {
@@ -93,8 +96,8 @@ var gate = {
         header.SIGN = getSign(querystring.stringify(form));
         console.log(header);
         console.log(querystring.stringify(form));
-        console.log(API_URL + DEPOSITADDRESS_URL);
-        Request({method: 'POST', url: API_URL + DEPOSITADDRESS_URL, headers: header, form:form },cp);
+        console.log(API_TRADE_URL + DEPOSITADDRESS_URL);
+        Request({method: 'POST', url: API_TRADE_URL + DEPOSITADDRESS_URL, headers: header, form:form },cp);
     },
 
 
@@ -103,7 +106,7 @@ var gate = {
         let header = {};
         header.KEY = KEY;
         header.SIGN = getSign(querystring.stringify(form));
-        Request({method: 'POST', url: API_URL + DEPOSITSWITHDRAWALS_URL, headers: header, form:form },cp);
+        Request({method: 'POST', url: API_TRADE_URL + DEPOSITSWITHDRAWALS_URL, headers: header, form:form },cp);
     },
 
     buy:function (currencyPair, rate, amount, cp) {
@@ -111,7 +114,7 @@ var gate = {
         let header = {};
         header.KEY = KEY;
         header.SIGN = getSign(querystring.stringify(form));
-        Request({method: 'POST', url: API_URL + BUY_URL, headers: header, form:form },cp);
+        Request({method: 'POST', url: API_TRADE_URL + BUY_URL, headers: header, form:form },cp);
     },
 
     sell:function (currencyPair, rate, amount, cp) {
@@ -119,7 +122,7 @@ var gate = {
         let header = {};
         header.KEY = KEY;
         header.SIGN = getSign(querystring.stringify(form));
-        Request({method: 'POST', url: API_URL + BUY_URL, headers: header, form:form },cp);
+        Request({method: 'POST', url: API_TRADE_URL + SELL_URL, headers: header, form:form },cp);
     },
 
     cancelOrder:function (orderNumber, currencyPair , cp) {
@@ -127,7 +130,7 @@ var gate = {
         let header = {'Content-Type':'application/x-www-form-urlencoded'};
         header.KEY = KEY;
         header.SIGN = getSign(querystring.stringify(form));
-        Request({method: 'POST', url: API_URL + CANCELORDER_URL, headers: header, form:form },cp);
+        Request({method: 'POST', url: API_TRADE_URL + CANCELORDER_URL, headers: header, form:form },cp);
     },
 
     cancelAllOrders:function (type, currencyPair , cp) {
@@ -135,7 +138,7 @@ var gate = {
         let header = {'Content-Type':'application/x-www-form-urlencoded'};
         header.KEY = KEY;
         header.SIGN = getSign(querystring.stringify(form));
-        Request({method: 'POST', url: API_URL + CANCELALLORDERS_URL, headers: header, form:form },cp);
+        Request({method: 'POST', url: API_TRADE_URL + CANCELALLORDERS_URL, headers: header, form:form },cp);
     },
 
     getOrder:function (orderNumber, currencyPair , cp) {
@@ -143,7 +146,7 @@ var gate = {
         let header = {'Content-Type':'application/x-www-form-urlencoded'};
         header.KEY = KEY;
         header.SIGN = getSign(querystring.stringify(form));
-        Request({method: 'POST', url: API_URL + GETORDER_URL, headers: header, form:form },cp);
+        Request({method: 'POST', url: API_TRADE_URL + GETORDER_URL, headers: header, form:form },cp);
     },
 
     openOrders:function ( cp) {
@@ -151,7 +154,7 @@ var gate = {
         let header = {'Content-Type':'application/x-www-form-urlencoded'};
         header.KEY = KEY;
         header.SIGN = getSign(querystring.stringify(form));
-        Request({method: 'POST', url: API_URL + OPENORDERS_URL, headers: header, form:form },cp);
+        Request({method: 'POST', url: API_TRADE_URL + OPENORDERS_URL, headers: header, form:form },cp);
     },
 
     myTradeHistory:function (currencyPair, orderNumber, cp) {
@@ -159,7 +162,7 @@ var gate = {
         let header = {'Content-Type':'application/x-www-form-urlencoded'};
         header.KEY = KEY;
         header.SIGN = getSign(querystring.stringify(form));
-        Request({method: 'POST', url: API_URL + MYTRADEHISTORY_URL, headers: header, form:form },cp);
+        Request({method: 'POST', url: API_TRADE_URL + MYTRADEHISTORY_URL, headers: header, form:form },cp);
     },
 
     withdraw:function (currency,amount, address, cp) {
@@ -167,7 +170,7 @@ var gate = {
         let header = {'Content-Type':'application/x-www-form-urlencoded'};
         header.KEY = KEY;
         header.SIGN = getSign(querystring.stringify(form));
-        Request({method: 'POST', url: API_URL + WITHDRAW_URL, headers: header, form:form },cp);
+        Request({method: 'POST', url: API_TRADE_URL + WITHDRAW_URL, headers: header, form:form },cp);
     },
 
 };

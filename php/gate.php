@@ -13,7 +13,7 @@
 
 		// generate the POST data string
 		$post_data = http_build_query($req, '', '&');
-		$sign = hash_hmac('sha512', $post_data, $secret);
+		$sign = hash_hmac('sha512', urldecode($post_data), $secret);
 
 		// generate the extra headers
 		$headers = array(
@@ -29,7 +29,7 @@
 			curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36');
 		}
 
-		curl_setopt($ch, CURLOPT_URL, 'http://data.gate.io/api2/'.$path);
+		curl_setopt($ch, CURLOPT_URL, 'http://api.gateio.io/api2/'.$path);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_HEADER, false);
@@ -61,7 +61,7 @@
 				'Mozilla/4.0 (compatible; gate PHP bot; '.php_uname('a').'; PHP/'.phpversion().')'
 				);
 		}
-		curl_setopt($ch, CURLOPT_URL, 'https://data.gate.io/api2/'.$url);
+		curl_setopt($ch, CURLOPT_URL, 'https://data.gateio.io/api2/'.$url);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 
 		// run the query
@@ -181,20 +181,22 @@
 		);
 	}
 	
-	function get_order($order_number) {
+	function get_order($order_number, $currency_pair) {
 		
 		return gate_query('1/private/getOrder',
 			array(
-				'orderNumber' => $order_number
+				'orderNumber' => $order_number,
+				'currencyPair' => strtoupper($currency_pair)
 			)
 		);
 	}
 	
-	function cancel_order($order_number) {
+	function cancel_order($order_number, $currency_pair) {
 		
 		return gate_query('1/private/cancelOrder',
 			array(
-				'orderNumber' => $order_number
+				'orderNumber' => $order_number,
+				'currencyPair' => strtoupper($currency_pair)
 			)
 		);
 	}
@@ -350,7 +352,7 @@ try {
 
 
     //取消下单
-//    print_r(cancel_order(263393711));
+//    print_r(cancel_order(263393711), 'etc_btc');
 
 
     //取消所有下单
@@ -358,7 +360,7 @@ try {
 
 
     //获取下单状态
-//    print_r(get_order(263393711));
+//    print_r(get_order(263393711, 'etc_btc'));
 
 
     //获取我的当前挂单列表
